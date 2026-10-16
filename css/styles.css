@@ -1,0 +1,20 @@
+body {
+    background-color: rgb(40, 40, 40);
+    color: #ccc;
+    border-color: #ccc;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: center;
+    height: 100vh;
+
+}
+
+main #search-box {
+    align-self: self-start;
+    justify-self: center;
+    width: 100%;
+    max-width: 20rem;
+}
