@@ -6,13 +6,16 @@ body {
 
 main {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     place-items: center;
-    height: 100vh;
 
 }
 
-main #search-box {
+main article {
+    align-self: start;
+}
+
+article #search-box {
     align-self: self-start;
     justify-self: center;
     width: 100%;

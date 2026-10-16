@@ -2,12 +2,32 @@
 
 ## 1. The exercise
 
-Use these two URLs to build **two search features on the same page**:
+Use these two URLs to build **two independent search features on the same page**:
 
 | Feature  | URL                                             |
 | -------- | ----------------------------------------------- |
 | Products | `https://dummyjson.com/products/search?q=phone` |
 | Recipes  | `https://dummyjson.com/recipes/search?q=pizza`  |
+
+### How the page behaves
+
+The page has two sections, each one with **its own search box and its own results area**:
+
+- **Products**: search box + results.
+- **Recipes**: search box + results.
+
+The two features are **independent**. There is no shared search box, no `select`, and no relation between them:
+
+1. Typing in the Products box only updates the Products results. Typing in the Recipes box only updates the Recipes results.
+2. Each feature has its own Loading, Empty and Error state. A slow Recipes request never shows a loading message in the Products area, and vice versa.
+3. Each feature has its own favorites, stored separately. Marking a product never marks a recipe.
+4. Both start empty. Nothing is fetched on page load.
+
+Example: type `phone` in Products and cards appear; type `pizza` in Recipes and cards appear in the other section. Products still shows the phones.
+
+**Not part of this exercise:** searching both features with one box, falling back from one to the other when there are no results, or showing combined results. That comes in a later exercise.
+
+**Why two independent features?** The point is the structure, not the product. Once Products works, adding Recipes should cost a new folder and one line in `main.js`, without touching the first feature. You can build Products first and add Recipes at the end (Phase C).
 
 For **each** feature:
 
@@ -42,6 +62,7 @@ Begin from the simple: make it work first, refactor later. Your final solution s
 - [ ] Loading, empty and error states work (try the offline mode in DevTools)
 - [ ] Typing fast never shows results for an older query
 - [ ] Favorite toggles, survives a new search, survives a reload, and is independent per feature
+- [ ] Searching in one feature never touches the other (results, loading state or favorites)
 - [ ] `<img onerror=...>` typed into a search box or returned by the API does not execute
 - [ ] Looks right at 360 px and at 1440 px
 
