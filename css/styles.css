@@ -21,3 +21,20 @@ article #search-box {
     width: 100%;
     max-width: 20rem;
 }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: 1rem;
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    border-color: #ccc;
+    border-radius: 1rem;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+}
