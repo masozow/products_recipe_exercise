@@ -23,7 +23,23 @@ document.addEventListener('DOMContentLoaded', () => {
             debouncedSearch(e.target.value);
         });
         //#endregion
-
+        //#region favorite logic
+        const { toggleFavorite } = apiProductRepository(HttpClient);
+        const actions = {
+            'toggle-favorite': (id) => toggleFavorite(Number(id))
+        }
+        results.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            console.dir(btn);
+            const action = actions[btn.dataset.action];
+            if (!action) return;
+            const card = btn.closest('.card');
+            if (!card) return;
+            const favorites = action(card.dataset.id);
+            console.log('favs:', favorites);
+        });
+        //#endregion
     } catch (error) {
         console.error(error_prefix, error);
     }

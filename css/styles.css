@@ -40,9 +40,11 @@ section #search-box {
     border-radius: 1rem;
 }
 
-.card btn {
+.card button {
     background-color: turquoise;
-    color: #ccc;
+    color: rgb(40, 40, 40);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
 }
 
 .card .content {
