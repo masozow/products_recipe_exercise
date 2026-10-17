@@ -16,7 +16,6 @@ export const apiProductRepository = (httpClient) => {
                 const rawProducts = await httpClient({ url });
                 if (!rawProducts.products) throw new Error(error_prefix + `Products object didn't returned: ${rawProducts}`)
                 if (!Array.isArray(rawProducts.products)) throw new Error(error_prefix + `Endpoint returned an invalid type: ${rawProducts}`);
-                console.log('Raw products: ', rawProducts.products);
                 state.products = rawProducts.products.map((product) => Product({ ...product }));
                 return state.products;
             } catch (error) {
