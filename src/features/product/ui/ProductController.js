@@ -12,6 +12,7 @@ export const productUI = ({ dom, productService }) => {
     if (!productsSearch) throw new Error(error_prefix + ' Products search is required.');
     if (!productsResults) throw new Error(error_prefix + ' Products results is required.');
     if (!productService) throw new Error(error_prefix + 'Service is required');
+    //#region Search logic
     const { search, subscribe, toggleFavorite } = productService;
     subscribe((state) => productsResults.innerHTML = renderGrid(state));
 
