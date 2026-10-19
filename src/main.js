@@ -43,8 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!action) return;
             const card = btn.closest('.card');
             if (!card) return;
-            const action_result = action(card.dataset.id);
-            console.log(action_result);
+            action(card.dataset.id);
         })
         //#endregion
     } catch (error) {

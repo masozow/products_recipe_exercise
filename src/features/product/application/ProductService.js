@@ -5,10 +5,18 @@ export const productService = ({ getProducts } = {}) => {
         favorites: []
     }
     const listeners = new Set();
-    const notify = () => {
-        console.log('State at notify: ', state);
-        listeners.forEach((listener) => listener(state));
+    const getViewState = () => {
+        return {
+            products: state.products.map((product) => ({ ...product, isFavorite: state.favorites.includes(product.id) })),
+            favorites: [...state.favorites]
+        }
     }
+    const notify = () => {
+        const viewState = getViewState();
+        console.log('State at notify: ', viewState);
+        listeners.forEach((listener) => listener(viewState));
+    }
+
     return {
         subscribe: (listener) => {
             if (typeof listener !== 'function') throw new Error(error_prefix + ' Listener must be a function');
@@ -21,11 +29,6 @@ export const productService = ({ getProducts } = {}) => {
                 if (!getProducts) throw new Error(error_prefix + 'Get Products function is required');
                 if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
                 state.products = await getProducts(query);
-                //#region Sync favorites to products state
-                state.products.forEach((product) => {
-                    if (state.favorites.includes(product.id)) product.isFavorite = true;
-                })
-                //#endregion
                 notify();
                 return state.products;
             } catch (error) {
