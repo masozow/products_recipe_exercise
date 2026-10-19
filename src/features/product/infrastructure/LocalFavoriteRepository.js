@@ -4,7 +4,7 @@ export const localFavoriteRepository = () => {
     return {
         getFavorites: () => {
             try {
-                const favs = JSON.parse(localStorage.getItem(key) || []);
+                const favs = JSON.parse(localStorage.getItem(key)) || [];
                 return favs;
             } catch (error) {
                 console.error(error_prefix, error);
