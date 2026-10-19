@@ -3,7 +3,7 @@ export const Product = ({ id, title, price, category, rating, thumbnail, brand =
     if (!id || !title || !price || !category || !rating || !thumbnail) {
         throw new Error(error_prefix + ' Some of the required fields is missing.')
     }
-    return {
+    const product = {
         id,
         title,
         price,
@@ -12,8 +12,6 @@ export const Product = ({ id, title, price, category, rating, thumbnail, brand =
         thumbnail,
         brand,
         isFavorite,
-        toggleFavorite() {
-            isFavorite = !isFavorite;
-        }
     }
+    return product;
 }

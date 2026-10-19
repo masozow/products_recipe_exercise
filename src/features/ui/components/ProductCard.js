@@ -11,7 +11,7 @@ export const ProductCard = (product) => `
             
         </div>
         <p class="price">${product.price}</p>
-        <button data-action='toggle-favorite'>
+        <button data-action='toggle-product-favorite'>
             ${product.isFavorite ? '[*] Remove favorite' : '[ ] Add to favorites'}
         </button>
     </article>

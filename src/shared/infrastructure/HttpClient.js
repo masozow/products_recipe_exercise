@@ -18,7 +18,7 @@ export const HttpClient = async ({ url, options = {}, fetch = window.fetch }) =>
         return response.json();
     } catch (error) {
         console.error(error_prefix, error);
-        throw error;
+        return [];
     }
 
 }
