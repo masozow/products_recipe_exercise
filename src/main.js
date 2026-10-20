@@ -2,11 +2,18 @@ import { ProductModule } from "./features/product/ProductModule.js";
 document.addEventListener('DOMContentLoaded', () => {
     const error_prefix = '[Main error] ';
     try {
-        //#region DOM elements
+        //#region Product
+        //DOM elements
         const productsSearch = document.getElementById('products-search');
         const productsResults = document.getElementById('products-result');
-        //#endregion
+        //Logic
         ProductModule({ productsSearch, productsResults });
+        //#endregion
+        //#region Recipe
+        //DOM elements
+        const recipesSearch = document.getElementById('recipes-search');
+        const recipesResults = document.getElementById('recipes-result');
+        //#endregion
     } catch (error) {
         console.error(error_prefix, error);
     }
