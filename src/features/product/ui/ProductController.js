@@ -3,7 +3,6 @@ import { CardsGrid } from "../../../shared/ui/components/CardsGrid.js";
 import { debounce } from "../../../shared/utils/debounce.js";
 
 const renderGrid = (state) => {
-    console.log('products:', state.products);
     return CardsGrid({ data: state.products, CardComponent: ProductCard });
 }
 export const productUI = ({ dom, productService }) => {

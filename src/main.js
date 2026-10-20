@@ -11,3 +11,4 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error(error_prefix, error);
     }
 });
+import('./shared/test/index.js');

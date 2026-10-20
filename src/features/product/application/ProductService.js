@@ -14,7 +14,6 @@ export const productService = ({ productRepo, favoriteRepo }) => {
     }
     const notify = () => {
         const viewState = getViewState();
-        console.log('State at notify: ', viewState);
         listeners.forEach((listener) => listener(viewState));
     }
 
