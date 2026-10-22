@@ -1,8 +1,8 @@
 export const Recipe = ({ id, name, cuisine, difficulty, rating, image, prepTimeMinutes, cookTimeMinutes }) => {
     const error_prefix = '[Domain error] Recipe.';
-    // if (!id || !name || !cuisine || !difficulty || !rating || !image || !prepTimeMinutes || !cookTimeMinutes)
-    //     throw new Error(error_prefix + ' Some required fields are missing');
-
+    const requiredFields = [id, name, cuisine, difficulty, rating, image, prepTimeMinutes, cookTimeMinutes];
+    if (requiredFields.some(field => field === undefined || field === null))
+        throw new Error(error_prefix + ' Some required fields are missing at: ' + id);
     const recipe = {
         id,
         name,
