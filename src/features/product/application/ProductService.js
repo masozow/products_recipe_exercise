@@ -25,15 +25,11 @@ export const productService = ({ productRepo, favoriteRepo }) => {
             return () => listeners.delete(listener);
         },
         search: async (query) => {
-            try {
-                if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
-                state.products = await productRepo.getProducts(query);
-                notify();
-                return state.products;
-            } catch (error) {
-                console.error(error_prefix, error);
-                return [];
-            }
+
+            if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
+            state.products = await productRepo.getProducts(query);
+            notify();
+            return state.products;
         },
         toggleFavorite: (productId) => {
             if (!productId) throw new Error(error_prefix + 'Id is required');

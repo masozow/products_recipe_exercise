@@ -3,21 +3,12 @@ export const localFavoriteRepository = () => {
     const key = 'favorites';
     return {
         getFavorites: () => {
-            try {
-                const favs = JSON.parse(localStorage.getItem(key)) || [];
-                return favs;
-            } catch (error) {
-                console.error(error_prefix, error);
-                return [];
-            }
+            const favs = JSON.parse(localStorage.getItem(key)) || [];
+            return favs;
         },
         setFavorites: (favorites) => {
             if (!favorites) throw new Error(error_prefix + 'Favorites are required.')
-            try {
-                localStorage.setItem(key, JSON.stringify(favorites))
-            } catch (error) {
-                console.error(error_prefix, error);
-            }
+            localStorage.setItem(key, JSON.stringify(favorites))
         }
     }
 }
