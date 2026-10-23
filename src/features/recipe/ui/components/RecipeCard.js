@@ -5,15 +5,15 @@ export const RecipeCard = (recipe) => {
     return `  
     <article data-id=${esc(id)} class='card ${isFavorite ? 'fav' : ''}'>
         <h3>${esc(name)}</h3>
-        
-        <div class='data'>
             ${Object.entries(rest).map(([key, value]) =>
-        `<div class='data-row'>
+        `
                 <p>${esc(String(key).replace('_', ' '))}</p>
                 <p class='value'>${esc(value)}</p>
-            </div>`).join('')}
+            `).join('')}
         
-        </div>
         <img loading=lazy src=${image} alt=${name}/>
+        <button data-action=['toggle-recipe-favorite']>
+        ${isFavorite ? '[*] Remove favorite' : '[ ] Add to favorites'}
+        </button>
     </article>
 `};
