@@ -2,7 +2,8 @@ import { ProductCard } from "./components/ProductCard.js"
 import { CardsGrid } from "../../../shared/ui/components/CardsGrid.js";
 import { debounce } from "../../../shared/utils/debounce.js";
 
-const renderGrid = (state) => {
+const renderGrid = (state, query) => {
+    if (state.products.length === 0) return query ? 'No data found' : '';
     return CardsGrid({ data: state.products, CardComponent: ProductCard });
 }
 export const productUI = ({ dom, productService }) => {
@@ -14,7 +15,7 @@ export const productUI = ({ dom, productService }) => {
         if (!productService) throw new Error(error_prefix + 'Service is required');
         //#region Search logic
         const { search, subscribe, toggleFavorite } = productService;
-        subscribe((state) => productsResults.innerHTML = renderGrid(state));
+        subscribe((state) => productsResults.innerHTML = renderGrid(state, productsSearch.value.trim()));
 
         const debouncedSearch = debounce(async (query) => await search(query), 500);
         productsSearch.addEventListener('input', async (e) => {

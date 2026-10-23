@@ -4,5 +4,5 @@ export const getItems = async ({ query, item_acces_key, ItemShape, url, error_me
     const items = rawData[item_acces_key];
     if (!items) throw new Error(error_message_prefix + ` Server didn't returned a ${item_acces_key} object.`);
     if (!Array.isArray(items)) throw new Error(error_message_prefix + ' Api returned an invalid array.');
-    return items.map((item) => ItemShape({ ...item }));
+    return items.map((item) => ItemShape(item));
 }
