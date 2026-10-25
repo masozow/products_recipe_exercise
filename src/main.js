@@ -2,8 +2,7 @@ import { ProductModule } from "./features/product/ProductModule.js";
 import { apiRecipeRespository } from "./features/recipe/infrastructure/ApiRecipeRepository.js";
 import { HttpClient } from "./shared/infrastructure/HttpClient.js";
 import { recipeService } from "./features/recipe/application/RecipeService.js";
-import { RecipeCard } from "./features/recipe/ui/components/RecipeCard.js";
-import { debounce } from './shared/utils/debounce.js';
+import { recipeUI } from "./features/recipe/ui/RecipeController.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const error_prefix = '[Main error] ';
@@ -20,40 +19,16 @@ document.addEventListener('DOMContentLoaded', () => {
         //DOM elements
         const recipesSearch = document.getElementById('recipes-search');
         const recipesResults = document.getElementById('recipes-result');
-        //#region UI logic
-        const render = (recipes, query) => {
-            if (recipes.length === 0) return query ? 'No data found.' : '';
-            return `
-            <div class='grid'>
-                ${recipes.map((recipe) => RecipeCard(recipe)).join('')}
-            </div>
-            `;
-        }
-        //#endregion
-        //#region SearchLogic
-        const apiRepo = apiRecipeRespository(HttpClient);
-        const { search, toggleFavorite, subscribe } = recipeService({ recipeRepo: apiRepo });
-        subscribe((state) => recipesResults.innerHTML = render(state.recipes, recipesSearch.value));
-        const debouncedSearch = debounce(async (query) => await search(query), 500);
-        recipesSearch.addEventListener('input', async (e) =>
-            debouncedSearch(e.target.value)
-        )
-        //#endregion
-        //#region favorite recipe logic
-        const actions = {
-            'toggle-recipe-favorite': (id) => toggleFavorite(Number(id))
-        }
-        recipesResults.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-action]');
-            if (!btn) return;
-            const action = actions[btn.dataset.action];
-            if (!action) return;
-            const card = btn.closest('.card');
-            if (!card) return;
-            const recipeId = card.dataset.id;
-            action(recipeId);
+        //Logic
+        const recipeRepo = apiRecipeRespository(HttpClient);
+        const recipe_service = recipeService({ recipeRepo });
+        recipeUI({
+            dom: {
+                recipesSearch,
+                recipesResults
+            },
+            recipeService: recipe_service
         });
-        //#endregion
         //#endregion
     } catch (error) {
         console.error(error_prefix, error);
