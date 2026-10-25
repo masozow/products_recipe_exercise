@@ -1,4 +1,4 @@
-export const Recipe = ({ id, name, cuisine, difficulty, rating, image, prepTimeMinutes, cookTimeMinutes }) => {
+export const Recipe = ({ id, name, cuisine, difficulty, rating, image, prepTimeMinutes, cookTimeMinutes, isFavorite = false }) => {
     const error_prefix = '[Domain error] Recipe.';
     const requiredFields = [id, name, cuisine, difficulty, rating, image, prepTimeMinutes, cookTimeMinutes];
     if (requiredFields.some(field => field === undefined || field === null))
@@ -10,8 +10,8 @@ export const Recipe = ({ id, name, cuisine, difficulty, rating, image, prepTimeM
         difficulty,
         rating,
         image,
+        isFavorite,
         total_time: Number(prepTimeMinutes) + Number(cookTimeMinutes)
     };
-    console.log(recipe);
     return recipe;
 }

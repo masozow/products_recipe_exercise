@@ -32,15 +32,27 @@ document.addEventListener('DOMContentLoaded', () => {
         //#endregion
         //#region SearchLogic
         const apiRepo = apiRecipeRespository(HttpClient);
-        const { search } = recipeService({ recipeRepo: apiRepo });
-        const handleSearch = async (query) => {
-            const recipes = await search(query);
-            recipesResults.innerHTML = render(recipes, query);
-        }
-        const debouncedSearch = debounce(handleSearch, 500);
+        const { search, toggleFavorite, subscribe } = recipeService({ recipeRepo: apiRepo });
+        subscribe((state) => recipesResults.innerHTML = render(state.recipes, recipesSearch.value));
+        const debouncedSearch = debounce(async (query) => await search(query), 500);
         recipesSearch.addEventListener('input', async (e) =>
             debouncedSearch(e.target.value)
         )
+        //#endregion
+        //#region favorite recipe logic
+        const actions = {
+            'toggle-recipe-favorite': (id) => toggleFavorite(Number(id))
+        }
+        recipesResults.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = actions[btn.dataset.action];
+            if (!action) return;
+            const card = btn.closest('.card');
+            if (!card) return;
+            const recipeId = card.dataset.id;
+            action(recipeId);
+        });
         //#endregion
         //#endregion
     } catch (error) {
