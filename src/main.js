@@ -1,8 +1,5 @@
 import { ProductModule } from "./features/product/ProductModule.js";
-import { apiRecipeRespository } from "./features/recipe/infrastructure/ApiRecipeRepository.js";
-import { HttpClient } from "./shared/infrastructure/HttpClient.js";
-import { recipeService } from "./features/recipe/application/RecipeService.js";
-import { recipeUI } from "./features/recipe/ui/RecipeController.js";
+import { RecipeModule } from "./features/recipe/RecipeModule.js";
 document.addEventListener('DOMContentLoaded', () => {
     const error_prefix = '[Main error] ';
     try {
@@ -18,11 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         //DOM elements
         const recipesSearch = document.getElementById('recipes-search');
         const recipesResults = document.getElementById('recipes-result');
-
         //Logic
-        const recipeRepo = apiRecipeRespository(HttpClient);
-        const recipe_service = recipeService({ recipeRepo });
-        recipeUI({ dom: { recipesSearch, recipesResults }, recipeService: recipe_service });
+        RecipeModule({ recipesSearch, recipesResults });
         //#endregion
     } catch (error) {
         console.error(error_prefix, error);

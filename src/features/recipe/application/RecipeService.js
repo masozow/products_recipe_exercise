@@ -1,9 +1,8 @@
-import { localFavoriteRepository } from "../../../shared/infrastructure/LocalFavoriteRepository.js";
-
-export const recipeService = ({ recipeRepo }) => {
+export const recipeService = ({ recipeRepo, favoriteRepo }) => {
     const error_prefix = '[Application error] RecipeService. ';
     if (!recipeRepo) throw new Error(error_prefix + ' Recipe repository is required.');
-    const { getFavorites, setFavorites } = localFavoriteRepository({ key: 'recipes-favorites' })
+    if (!favoriteRepo) throw new Error(error_prefix + ' Favorites repository is required.');
+    const { getFavorites, setFavorites } = favoriteRepo;
 
     const state = {
         recipes: [],
