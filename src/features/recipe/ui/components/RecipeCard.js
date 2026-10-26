@@ -2,7 +2,6 @@ import { esc } from "../../../../shared/utils/escapeHTML.js";
 
 export const RecipeCard = (recipe) => {
     const { image, id, isFavorite, name, ...rest } = recipe;
-    console.log('Recipe at card: ', recipe);
     return `  
     <article data-id=${esc(id)} class='card ${isFavorite ? 'fav' : ''}'>
         <h3>${esc(name)}</h3>

@@ -15,7 +15,6 @@ export const recipeUI = ({ dom, recipeService }) => {
         if (!recipesResults) throw new Error(error_prefix + 'recipesResults is required.');
         if (!recipeService) throw new Error(error_prefix + 'recipeService is required.');
         //#region SearchLogic
-        console.dir(recipeService);
         const { search, toggleFavorite, subscribe } = recipeService;
         subscribe((state) => recipesResults.innerHTML = render(state, recipesSearch.value));
         const debouncedSearch = debounce(async (query) => await search(query), 500);

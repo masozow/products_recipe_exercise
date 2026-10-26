@@ -5,24 +5,19 @@ export const recipeService = ({ recipeRepo }) => {
         recipes: [],
         favorites: []
     }
-    const listeners = new Set();
-
     const getViewState = () => {
-        const favs = state.favorites;
+        const favoritesSet = new Set(state.favorites);
         return {
-            recipes: state.recipes.map((recipe) => ({ ...recipe, isFavorite: favs.includes(recipe.id) })),
+            recipes: state.recipes.map((recipe) => ({ ...recipe, isFavorite: favoritesSet.has(recipe.id) })),
             favorites: [...state.favorites]
         }
     }
-    const notify = () => {
-        const viewState = getViewState();
-        listeners.forEach((listener) => listener(viewState));
-    }
+
     return {
         search: async (query) => {
             if (typeof query !== 'string') throw new Error(error_prefix + ' Query must be a string.');
             state.recipes = await recipeRepo.getRecipes(query);
-            notify();
+            return getViewState();
         },
         toggleFavorite(recipeId) {
             if (!recipeId) throw new Error(error_prefix, ' The recipe Id is required');
@@ -33,14 +28,8 @@ export const recipeService = ({ recipeRepo }) => {
                 favs.push(recipeId);
             }
             state.favorites = favs;
-            notify();
+            return getViewState();
         },
-        subscribe: (listener) => {
-            if (typeof listener !== 'function') throw new Error(error_prefix, 'Listener must be a function.');
-            listeners.add(listener);
-            const viewState = getViewState();
-            listener(viewState);
-            return () => listeners.delete(listener);
-        }
+
     }
 }
