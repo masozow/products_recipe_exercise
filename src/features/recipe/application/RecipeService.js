@@ -1,18 +1,22 @@
+import { localFavoriteRepository } from "../../../shared/infrastructure/LocalFavoriteRepository.js";
+
 export const recipeService = ({ recipeRepo }) => {
     const error_prefix = '[Application error] RecipeService. ';
     if (!recipeRepo) throw new Error(error_prefix + ' Recipe repository is required.');
+    const { getFavorites, setFavorites } = localFavoriteRepository({ key: 'recipes-favorites' })
+
     const state = {
         recipes: [],
-        favorites: []
     }
     let reqId = 0;
     let lastQuery = '';
     const listeners = new Set();
     const getViewState = () => {
-        const favoritesSet = new Set(state.favorites);
+        const favorites = getFavorites();
+        const favoritesSet = new Set(favorites);
         return {
             recipes: state.recipes.map((recipe) => ({ ...recipe, isFavorite: favoritesSet.has(recipe.id) })),
-            favorites: [...state.favorites]
+            favorites: [...favorites]
         }
     }
     const notify = () => {
@@ -32,13 +36,14 @@ export const recipeService = ({ recipeRepo }) => {
         },
         toggleFavorite(recipeId) {
             if (!recipeId) throw new Error(error_prefix, ' The recipe Id is required');
-            let favs = state.favorites;
-            if (state.favorites.includes(recipeId)) {
-                favs = state.favorites.filter((id) => id !== recipeId);
+            const favorites = getFavorites();
+            let favs = favorites;
+            if (favorites.includes(recipeId)) {
+                favs = favorites.filter((id) => id !== recipeId);
             } else {
                 favs.push(recipeId);
             }
-            state.favorites = favs;
+            setFavorites(favs);
             notify();
         },
         subscribe: (listener_callback) => {
