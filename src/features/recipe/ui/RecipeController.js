@@ -28,10 +28,12 @@ export const recipeUI = ({ dom, recipeService }) => {
         }
         recipesResults.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-action]');
+            console.dir(btn.dataset);
             if (!btn) return;
             const action = actions[btn.dataset.action];
             if (!action) return;
             const card = btn.closest('.card');
+            console.dir(card.dataset);
             if (!card) return;
             const recipeId = card.dataset.id;
             action(recipeId);
