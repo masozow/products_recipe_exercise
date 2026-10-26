@@ -1,6 +1,6 @@
 import { CardsGrid } from "../../../shared/ui/components/CardsGrid.js";
 import { RecipeCard } from "./components/RecipeCard.js";
-
+import { debounce } from "../../../shared/utils/debounce.js";
 
 const render = (state, query) => {
     if (state.recipes.length === 0) return query ? 'No data found.' : '';
