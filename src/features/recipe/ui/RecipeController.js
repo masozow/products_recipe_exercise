@@ -32,8 +32,7 @@ export const recipeUI = ({ dom, recipeService }) => {
             if (!btn) return;
             const action = actions[btn.dataset.action];
             if (!action) return;
-            const card = btn.closest('.card');
-            console.dir(card.dataset);
+            const card = btn.closest('[data-component="recipe-card"]');
             if (!card) return;
             const recipeId = card.dataset.id;
             action(recipeId);

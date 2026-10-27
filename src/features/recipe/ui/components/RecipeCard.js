@@ -9,9 +9,9 @@ export const RecipeCard = (recipe) => {
     return `  
     <article 
     data-id=${esc(id)} 
-    data-active-class=${presentationState.class}
+    data-active-class=${presentationState.activeClass}
     data-component="recipe-card"
-    class='card ${isFavorite ? presentationState.class : ''}'>
+    class='card ${isFavorite ? presentationState.activeClass : ''}'>
         <h3>${esc(name)}</h3>
             ${Object.entries(rest).map(([key, value]) =>
         `
