@@ -8,8 +8,8 @@ export const RecipeCard = (recipe) => {
     }
     return `  
     <article 
-    data-id=${esc(id)} 
-    data-active-class=${presentationState.activeClass}
+    data-id="${esc(id)}" 
+    data-active-class="${presentationState.activeClass}"
     data-component="recipe-card"
     class='card ${isFavorite ? presentationState.activeClass : ''}'>
         <h3>${esc(name)}</h3>
@@ -19,7 +19,7 @@ export const RecipeCard = (recipe) => {
                 <p class='value'>${esc(value)}</p>
             `).join('')}
         
-        <img loading=lazy src=${image} alt=${name}/>
+        <img loading=lazy src="${esc(image)}" alt="${esc(name)}"/>
         <button 
         data-action='toggle-recipe-favorite'
         data-active-text="${presentationState.btnText(true)}"

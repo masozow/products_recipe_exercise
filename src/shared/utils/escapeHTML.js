@@ -2,7 +2,7 @@ export const esc = (value) => {
     const escape_HTML = {
         '&': '&amp;',
         '<': '&lt;',
-        '>': '&gt',
+        '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;'
     }
