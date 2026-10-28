@@ -1,6 +1,4 @@
-import { ProductModule } from "./features/product/ProductModule.js";
-import { RecipeModule } from "./features/recipe/RecipeModule.js";
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const error_prefix = '[Main error] ';
     try {
         //#region Product
@@ -8,7 +6,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const productsSearch = document.getElementById('products-search');
         const productsResults = document.getElementById('products-result');
         //Logic
-        ProductModule({ productsSearch, productsResults });
+        if (productsSearch && productsResults) {
+            const { ProductModule } = await import('./features/product/ProductModule.js');
+            ProductModule({ productsSearch, productsResults });
+        }
         //#endregion
 
         //#region Recipe
@@ -16,7 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const recipesSearch = document.getElementById('recipes-search');
         const recipesResults = document.getElementById('recipes-result');
         //Logic
-        RecipeModule({ recipesSearch, recipesResults });
+        if (recipesSearch && recipesResults) {
+            const { RecipeModule } = await import('./features/recipe/RecipeModule.js');
+            RecipeModule({ recipesSearch, recipesResults });
+        }
+
         //#endregion
     } catch (error) {
         console.error(error_prefix, error);
