@@ -1,14 +1,29 @@
 import { esc } from "../../../../shared/utils/escapeHTML.js";
-export const ProductCard = (product) => `
-    <article data-id=${esc(product.id)} class='card ${product.isFavorite ? 'fav' : ''}'>
-        <h3>${esc(product.title)}</h3>
-        <p>Category</p><p> ${esc(product.category)}</p>
-        <p>Rating</p><p>${esc(product.rating)}</p>
-        ${esc(product.brand) ? '<p>Brand</p><p>' + esc(product.brand) + '</p>' : ''}       
-        <img loading='lazy' src=${esc(product.thumbnail)} alt=${esc(product.title)}/>    
-        <p class="price">${esc(product.price)}</p>
-        <button data-action='toggle-product-favorite'>
-            ${product.isFavorite ? '[*] Remove favorite' : '[ ] Add to favorites'}
+export const ProductCard = (product) => {
+    const { id, isFavorite, ...rest } = product;
+    const presentationState = {
+        activeClass: 'fav',
+        btnText: (isFavorite) => isFavorite ? '[*] Remove from favorites' : '[ ] Add to favorites'
+    }
+    return `
+    <article 
+    data-component='product-card' 
+    data-active-class=${presentationState.activeClass}
+    data-id=${esc(id)} 
+    class='card ${isFavorite ? presentationState.activeClass : ''}'
+    >
+        <h3>${esc(rest.title)}</h3>
+        <p>Category</p><p> ${esc(rest.category)}</p>
+        <p>Rating</p><p>${esc(rest.rating)}</p>
+        ${esc(rest.brand) ? '<p>Brand</p><p>' + esc(product.brand) + '</p>' : ''}       
+        <img loading='lazy' src=${esc(rest.thumbnail)} alt=${esc(product.title)}/>    
+        <p class="price">${esc(rest.price)}</p>
+        <button 
+        data-action='toggle-product-favorite'
+        data-active-text='${presentationState.btnText(true)}'
+        data-inactive-text='${presentationState.btnText(false)}'
+        >
+            ${presentationState.btnText(isFavorite)}
         </button>
     </article>
-`;
+`};
