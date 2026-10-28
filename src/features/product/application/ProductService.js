@@ -1,52 +1,75 @@
-export const productService = ({ getProducts } = {}) => {
-    const error_prefix = '[Application error] ProductService. ';
-    const state = {
-        products: [],
-        favorites: []
-    }
-    const listeners = new Set();
-    const getViewState = () => {
-        return {
-            products: state.products.map((product) => ({ ...product, isFavorite: state.favorites.includes(product.id) })),
-            favorites: [...state.favorites]
-        }
-    }
-    const notify = () => {
-        const viewState = getViewState();
-        console.log('State at notify: ', viewState);
-        listeners.forEach((listener) => listener(viewState));
-    }
+import { createSignal } from "../../../shared/utils/createSignal.js";
 
+export const productService = ({ productRepo, favoriteRepo }) => {
+    const error_prefix = '[Application error] ProductService. ';
+    if (!productRepo || !favoriteRepo) throw new Error(error_prefix + ' Repositories are required.');
+    const initialState = {
+        products: [],
+        isLoading: false,
+        isError: false,
+        isEmpty: false
+    }
+    const products = createSignal(initialState.products);
+    const isLoading = createSignal(initialState.isLoading);
+    const isError = createSignal(initialState.isError);
+    const isEmpty = createSignal(initialState.isEmpty);
+    let reqId = 0;
+    let lastQuery = '';
+    let favorites = favoriteRepo.getFavorites();
+    const searchState = (data) => {
+        if (!Array.isArray(data)) throw new Error(error_prefix + ' data is required as an Array.');
+        const favoritesSet = new Set(favorites);
+        return data.map((product) => ({ ...product, isFavorite: favoritesSet.has(product.id) }))
+    }
+    const resetSignals = () => {
+        products.set(initialState.products);
+        isLoading.set(initialState.isLoading);
+        isError.set(initialState.isError);
+        isEmpty.set(initialState.isEmpty);
+    }
     return {
-        subscribe: (listener) => {
-            if (typeof listener !== 'function') throw new Error(error_prefix + ' Listener must be a function');
-            listeners.add(listener);
-            listener(state);
-            return () => listeners.delete(listener);
-        },
+        onErrorChange: isError.subscribe,
+        onLoadingChange: isLoading.subscribe,
+        onProductChange: products.subscribe,
+        onEmptyChange: isEmpty.subscribe,
         search: async (query) => {
+            if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
+            const normalizedQuery = query.trim();
+            if (normalizedQuery === '') {
+                resetSignals();
+            }
+            if (lastQuery === normalizedQuery) return;
+            lastQuery = normalizedQuery;
+            const currentReqId = ++reqId;
             try {
-                if (!getProducts) throw new Error(error_prefix + 'Get Products function is required');
-                if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
-                state.products = await getProducts(query);
-                notify();
-                return state.products;
+                isError.set(false);
+                isLoading.set(true);
+                isEmpty.set(false);
+                const data = await productRepo.getProducts(query);
+                if (currentReqId !== reqId) return;
+                if (data.length === 0 && normalizedQuery)
+                    isEmpty.set(true);
+                const state = searchState(data);
+                isLoading.set(false);
+                products.set(state);
             } catch (error) {
+                if (reqId !== currentReqId) return;
                 console.error(error_prefix, error);
-                return [];
+                isError.set(true);
+                isLoading.set(false);
             }
         },
         toggleFavorite: (productId) => {
             if (!productId) throw new Error(error_prefix + 'Id is required');
-            if (state.favorites.includes(productId)) {
-                let favs = state.favorites.filter((id) => id !== productId);
-                state.favorites = favs;
+            const id = Number(productId);
+            let isCurrentlyFavorite = favorites.includes(id);
+            if (isCurrentlyFavorite) {
+                favorites = favorites.filter((productId) => productId !== id);
             } else {
-                state.favorites.push(productId);
+                favorites = [...favorites, id];
             }
-            const productFound = state.products.find((product) => product.id === productId);
-            if (productFound) productFound.isFavorite = state.favorites.includes(productId);
-            notify();
+            favoriteRepo.setFavorites(favorites);
+            return !isCurrentlyFavorite;
         }
     }
 }

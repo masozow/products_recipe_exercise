@@ -7,17 +7,13 @@ export const apiProductRepository = (httpClient) => {
 
     return {
         getProducts: async (query) => {
-            try {
-                if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
-                const url = ProductsSearchURL(query);
-                const rawProducts = await httpClient({ url });
-                if (!rawProducts.products) throw new Error(error_prefix + `Products object didn't returned: ${rawProducts}`)
-                if (!Array.isArray(rawProducts.products)) throw new Error(error_prefix + `Endpoint returned an invalid type: ${rawProducts}`);
-                return rawProducts.products.map((product) => Product({ ...product }));
-            } catch (error) {
-                console.error(error_prefix, error);
-                return [];
-            }
+            if (!query.trim()) return [];
+            if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
+            const url = ProductsSearchURL(query);
+            const rawProducts = await httpClient({ url });
+            if (!rawProducts.products) throw new Error(error_prefix + `Products object didn't returned: ${rawProducts}`)
+            if (!Array.isArray(rawProducts.products)) throw new Error(error_prefix + `Endpoint returned an invalid type: ${rawProducts}`);
+            return rawProducts.products.map((product) => Product(product));
         },
     }
 }
