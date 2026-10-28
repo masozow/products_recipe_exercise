@@ -4,12 +4,13 @@ export const productService = ({ productRepo, favoriteRepo }) => {
     const state = {
         products: [],
     }
+    let favorites = favoriteRepo.getFavorites();
     const listeners = new Set();
     const getViewState = () => {
-        const favs = favoriteRepo.getFavorites();
+        const favoritesSet = new Set(favorites);
         return {
-            products: state.products.map((product) => ({ ...product, isFavorite: favs.includes(product.id) })),
-            favorites: [...favoriteRepo.getFavorites()]
+            products: state.products.map((product) => ({ ...product, isFavorite: favoritesSet.has(product.id) })),
+            favorites: [...favorites]
         }
     }
     const notify = () => {
@@ -33,16 +34,18 @@ export const productService = ({ productRepo, favoriteRepo }) => {
         },
         toggleFavorite: (productId) => {
             if (!productId) throw new Error(error_prefix + 'Id is required');
-            let favorites = favoriteRepo.getFavorites();
-            if (favorites.includes(productId)) {
-                favorites = favorites.filter((id) => id !== productId);
+            const id = Number(productId);
+            let isCurrentlyFavorite = favorites.includes(id);
+            if (isCurrentlyFavorite) {
+                favorites = favorites.filter((productId) => productId !== id);
             } else {
-                favorites.push(productId);
+                favorites = [...favorites, id];
             }
             favoriteRepo.setFavorites(favorites);
-            const productFound = state.products.find((product) => product.id === productId);
-            if (productFound) productFound.isFavorite = favorites.includes(productId);
-            notify();
+            return !isCurrentlyFavorite;
+            // const productFound = state.products.find((product) => product.id === productId);
+            // if (productFound) productFound.isFavorite = favorites.includes(productId);
+
         }
     }
 }

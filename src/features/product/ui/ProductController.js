@@ -1,11 +1,7 @@
-import { ProductCard } from "./components/ProductCard.js"
-import { CardsGrid } from "../../../shared/ui/components/CardsGrid.js";
 import { debounce } from "../../../shared/utils/debounce.js";
+import { productView } from "./ProductView.js";
 
-const renderGrid = (state, query) => {
-    if (state.products.length === 0) return query ? 'No data found' : '';
-    return CardsGrid({ data: state.products, CardComponent: ProductCard });
-}
+
 export const productUI = ({ dom, productService }) => {
     const error_prefix = '[UI error] ProductController. ';
     try {
@@ -13,9 +9,12 @@ export const productUI = ({ dom, productService }) => {
         if (!productsSearch) throw new Error(error_prefix + ' Products search is required.');
         if (!productsResults) throw new Error(error_prefix + ' Products results is required.');
         if (!productService) throw new Error(error_prefix + 'Service is required');
+
+        const { renderGrid, updateCardFavoriteStatus } = productView({ productResults: productsResults });
+
         //#region Search logic
         const { search, subscribe, toggleFavorite } = productService;
-        subscribe((state) => productsResults.innerHTML = renderGrid(state, productsSearch.value.trim()));
+        subscribe((state) => renderGrid(state, productsSearch.value.trim()));
 
         const debouncedSearch = debounce(async (query) => await search(query), 500);
         productsSearch.addEventListener('input', async (e) => {
@@ -32,10 +31,11 @@ export const productUI = ({ dom, productService }) => {
             if (!btn) return;
             const action = actions[btn.dataset.action];
             if (!action) return;
-            const card = btn.closest('.card');
+            const card = btn.closest('[data-component="product-card"]');
             console.dir(card.dataset);
             if (!card) return;
-            action(card.dataset.id);
+            const isFavorite = action(card.dataset.id);
+            updateCardFavoriteStatus({ card, btn, isFavorite });
         })
         //#endregion
     } catch (error) {
