@@ -35,6 +35,9 @@ export const recipeUI = ({ dom, recipeService }) => {
         recipesSearch.addEventListener('input', (e) =>
             debouncedSearch(e.target.value)
         )
+        const currentQuery = recipesSearch.value.trim();
+        if (currentQuery !== '')
+            search(currentQuery)
         //#endregion
         //#region favorite recipe logic
         const actions = {

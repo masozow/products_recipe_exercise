@@ -43,6 +43,10 @@ export const productUI = ({ dom, productService }) => {
         productsSearch.addEventListener('input', async (e) => {
             debouncedSearch(e.target.value);
         });
+        //Necessary to store the value the user wrote while JS was loading
+        const currentQuery = productsSearch.value.trim();
+        if (currentQuery !== '')
+            search(currentQuery)
         //#endregion
         //#region favorite logic
         const actions = {
