@@ -1,29 +1,47 @@
 import { CardsGrid } from "../../../shared/ui/components/CardsGrid.js";
 import { RecipeCard } from "./components/RecipeCard.js";
 
-export const renderGrid = (state, query) => {
-    if (state.recipes.length === 0) return query ? 'No data found.' : '';
-    return CardsGrid({ data: state.recipes, CardComponent: RecipeCard })
-}
-
-export const updateCardFavoriteStatus = ({ results, toggleFavorite }) => {
+export const recipewView = ({ results }) => {
     const error_prefix = '[UI Error] RecipeView. ';
     if (!results)
         throw new Error(error_prefix + 'results is required.');
-    if (typeof toggleFavorite !== 'function')
-        throw new Error(error_prefix + 'toggleFavorite must be a function.');
-    const actions = {
-        'toggle-recipe-favorite': (id) => toggleFavorite(Number(id))
+    return {
+        renderError: (errorState) => {
+            if (errorState)
+                results.innerHTML = `
+                <p class='.error'>
+                    Something went wrong, please try again later.
+                </p>
+                `;
+        },
+        renderLoading: (loadingState) => {
+            if (loadingState)
+                results.innerHTML = `
+                <p class='.loading'>
+                    Loading recipes...
+                </p>
+                `;
+        },
+        renderGrid: (data, query) => {
+            if (data.length === 0) return query ? 'No data found.' : '';
+            results.innerHTML = CardsGrid({ data, CardComponent: RecipeCard })
+        },
+        updateCardFavoriteStatus: ({ btn, card, isFavorite }) => {
+            if (!btn) throw new Error(error_prefix + ' Button (btn) is required.');
+            if (!card) throw new Error(error_prefix + ' Card is rquired.');
+            if (isFavorite === undefined) throw new Error(error_prefix + ' isFavorite is required.');
+            const activeClass = card.dataset.activeClass;
+            const btnActiveText = btn.dataset.activeText;
+            const btnInactiveText = btn.dataset.inactiveText;
+            if (isFavorite) {
+                card.classList.add(activeClass);
+                btn.textContent = btnActiveText;
+            } else {
+                card.classList.remove(activeClass);
+                btn.textContent = btnInactiveText;
+            }
+        }
     }
-    results.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-action]');
-        console.dir(btn.dataset);
-        if (!btn) return;
-        const action = actions[btn.dataset.action];
-        if (!action) return;
-        const card = btn.closest('[data-component="recipe-card"]');
-        if (!card) return;
-        const recipeId = card.dataset.id;
-        action(recipeId);
-    });
 }
+
+

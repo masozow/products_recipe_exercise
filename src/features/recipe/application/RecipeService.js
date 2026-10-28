@@ -1,56 +1,56 @@
+import { createSignal } from "../../../shared/utils/createSignal.js";
 export const recipeService = ({ recipeRepo, favoriteRepo }) => {
     const error_prefix = '[Application error] RecipeService. ';
     if (!recipeRepo) throw new Error(error_prefix + ' Recipe repository is required.');
     if (!favoriteRepo) throw new Error(error_prefix + ' Favorites repository is required.');
     const { getFavorites, setFavorites } = favoriteRepo;
+    let favorites = getFavorites();
+    const recipes = createSignal([]);
+    const isLoading = createSignal(false);
+    const isError = createSignal(false);
 
-    const state = {
-        recipes: [],
-    }
     let reqId = 0;
     let lastQuery = '';
-    const listeners = new Set();
-    const getViewState = () => {
-        const favorites = getFavorites();
+    const searchViewState = (data) => {
+        if (!Array.isArray(data)) throw new Error(error_prefix, ' Data Array is needed to make the searchViewState.');
         const favoritesSet = new Set(favorites);
-        return {
-            recipes: state.recipes.map((recipe) => ({ ...recipe, isFavorite: favoritesSet.has(recipe.id) })),
-            favorites: [...favorites]
-        }
-    }
-    const notify = () => {
-        const viewState = getViewState();
-        listeners.forEach((listener) => listener(viewState));
+        return data.map((recipe) => ({ ...recipe, isFavorite: favoritesSet.has(Number(recipe.id)) }))
     }
     return {
+        onRecipesChange: recipes.subscribe,
+        onLoadingChange: isLoading.subscribe,
+        onErrorChange: isError.subscribe,
         search: async (query) => {
-            const currentReqId = ++reqId;
             if (typeof query !== 'string') throw new Error(error_prefix + ' Query must be a string.');
+            const currentReqId = ++reqId;
             const normalizedQuery = query.trim();
             if (lastQuery === normalizedQuery) return;
             lastQuery = normalizedQuery;
             if (currentReqId !== reqId) return;
-            state.recipes = await recipeRepo.getRecipes(query);
-            notify();
+            isError.set(false);
+            isLoading.set(true)
+            try {
+                const data = await recipeRepo.getRecipes(query);
+                const viewState = searchViewState(data);
+                recipes.set(viewState);
+                isLoading.set(false);
+            } catch (error) {
+                isLoading.set(false);
+                isError.set(true);
+                console.error(error_prefix, error);
+            }
         },
         toggleFavorite(recipeId) {
             if (!recipeId) throw new Error(error_prefix, ' The recipe Id is required');
-            const favorites = getFavorites();
-            let favs = favorites;
-            if (favorites.includes(recipeId)) {
-                favs = favorites.filter((id) => id !== recipeId);
+            const id = Number(recipeId);
+            const isCurrentlyFavorite = favorites.includes(id);
+            if (isCurrentlyFavorite) {
+                favorites = favorites.filter((id) => id !== recipeId);
             } else {
-                favs.push(recipeId);
+                favorites = [...favorites, id];
             }
-            setFavorites(favs);
-            notify();
-        },
-        subscribe: (listener_callback) => {
-            if (typeof listener_callback !== 'function') throw new Error(error_prefix + 'Listener must be a function.');
-            listeners.add(listener_callback);
-            const viewState = getViewState();
-            listener_callback(viewState);
-            return () => listeners.delete(listener_callback);
+            setFavorites(favorites);
+            return !isCurrentlyFavorite;
         }
     }
 }

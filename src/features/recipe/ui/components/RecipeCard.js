@@ -22,8 +22,8 @@ export const RecipeCard = (recipe) => {
         <img loading=lazy src=${image} alt=${name}/>
         <button 
         data-action='toggle-recipe-favorite'
-        data-text-active="${presentationState.btnText(true)}"
-        data-text-inactive="${presentationState.btnText(false)}"
+        data-active-text="${presentationState.btnText(true)}"
+        data-inactive-text="${presentationState.btnText(false)}"
         >
         ${presentationState.btnText(isFavorite)}
         </button>
