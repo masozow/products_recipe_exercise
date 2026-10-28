@@ -9,19 +9,36 @@ export const productUI = ({ dom, productService }) => {
         if (!productsSearch) throw new Error(error_prefix + ' Products search is required.');
         if (!productsResults) throw new Error(error_prefix + ' Products results is required.');
         if (!productService) throw new Error(error_prefix + 'Service is required');
-
-        const { renderGrid, updateCardFavoriteStatus } = productView({ productResults: productsResults });
-
-        //#region Search logic
+        //Getting needed functions from factories
+        const {
+            renderEmpty,
+            renderLoading,
+            renderError,
+            renderGrid,
+            updateCardFavoriteStatus
+        } = productView({ productResults: productsResults });
         const {
             search,
             toggleFavorite,
             onProductChange,
             onErrorChange,
-            onLoadingChange
+            onLoadingChange,
+            onEmptyChange,
         } = productService;
-        onProductChange((data) => renderGrid(data, productsSearch.value.trim()));
-
+        //Subscriptions to signals for rendering control according to loading states:
+        onErrorChange((errorState) =>
+            renderError(errorState)
+        );
+        onLoadingChange((loadingState) =>
+            renderLoading(loadingState)
+        );
+        onEmptyChange((emptyState) =>
+            renderEmpty(emptyState)
+        );
+        onProductChange((data) => {
+            renderGrid(data, productsSearch.value.trim())
+        });
+        //#region Search logic
         const debouncedSearch = debounce(async (query) => await search(query), 500);
         productsSearch.addEventListener('input', async (e) => {
             debouncedSearch(e.target.value);
