@@ -1,36 +1,40 @@
+import { createSignal } from "../../../shared/utils/createSignal.js";
+
 export const productService = ({ productRepo, favoriteRepo }) => {
     const error_prefix = '[Application error] ProductService. ';
     if (!productRepo || !favoriteRepo) throw new Error(error_prefix + ' Repositories are required.');
-    const state = {
-        products: [],
-    }
+    const products = createSignal([]);
+    const isLoading = createSignal(false);
+    const isError = createSignal(false);
+    let reqId = 0;
+    let lastQuery = '';
     let favorites = favoriteRepo.getFavorites();
-    const listeners = new Set();
-    const getViewState = () => {
+    const searchState = (data) => {
+        if (!Array.isArray(data)) throw new Error(error_prefix + ' data is required as an Array.');
         const favoritesSet = new Set(favorites);
-        return {
-            products: state.products.map((product) => ({ ...product, isFavorite: favoritesSet.has(product.id) })),
-            favorites: [...favorites]
-        }
+        return data.map((product) => ({ ...product, isFavorite: favoritesSet.has(product.id) }))
     }
-    const notify = () => {
-        const viewState = getViewState();
-        listeners.forEach((listener) => listener(viewState));
-    }
-
     return {
-        subscribe: (listener) => {
-            if (typeof listener !== 'function') throw new Error(error_prefix + ' Listener must be a function');
-            listeners.add(listener);
-            listener(state);
-            return () => listeners.delete(listener);
-        },
+        onErrorChange: isError.subscribe,
+        onLoadingChange: isLoading.subscribe,
+        onProductChange: products.subscribe,
         search: async (query) => {
-
             if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
-            state.products = await productRepo.getProducts(query);
-            notify();
-            return state.products;
+            const currentReqId = ++reqId;
+            const normalizedQuery = query.trim();
+            if (currentReqId !== reqId) return;
+            if (lastQuery === normalizedQuery) return;
+            lastQuery = normalizedQuery;
+            try {
+                isError.set(false);
+                isLoading.set(true);
+                const data = await productRepo.getProducts(query);
+                const state = searchState(data);
+                products.set(state);
+            } catch (error) {
+                isError.set(true);
+                isLoading.set(false);
+            }
         },
         toggleFavorite: (productId) => {
             if (!productId) throw new Error(error_prefix + 'Id is required');
@@ -43,7 +47,7 @@ export const productService = ({ productRepo, favoriteRepo }) => {
             }
             favoriteRepo.setFavorites(favorites);
             return !isCurrentlyFavorite;
-            // const productFound = state.products.find((product) => product.id === productId);
+            // const productFound = products.find((product) => product.id === productId);
             // if (productFound) productFound.isFavorite = favorites.includes(productId);
 
         }

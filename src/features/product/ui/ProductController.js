@@ -13,8 +13,14 @@ export const productUI = ({ dom, productService }) => {
         const { renderGrid, updateCardFavoriteStatus } = productView({ productResults: productsResults });
 
         //#region Search logic
-        const { search, subscribe, toggleFavorite } = productService;
-        subscribe((state) => renderGrid(state, productsSearch.value.trim()));
+        const {
+            search,
+            toggleFavorite,
+            onProductChange,
+            onErrorChange,
+            onLoadingChange
+        } = productService;
+        onProductChange((data) => renderGrid(data, productsSearch.value.trim()));
 
         const debouncedSearch = debounce(async (query) => await search(query), 500);
         productsSearch.addEventListener('input', async (e) => {
@@ -27,12 +33,10 @@ export const productUI = ({ dom, productService }) => {
         }
         productsResults.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-action]');
-            console.dir(btn.dataset)
             if (!btn) return;
             const action = actions[btn.dataset.action];
             if (!action) return;
             const card = btn.closest('[data-component="product-card"]');
-            console.dir(card.dataset);
             if (!card) return;
             const isFavorite = action(card.dataset.id);
             updateCardFavoriteStatus({ card, btn, isFavorite });

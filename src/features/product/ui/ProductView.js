@@ -5,9 +5,9 @@ export const productView = ({ productResults }) => {
     const error_prefix = '[UI error] ProductView.';
     if (!productResults) throw new Error(error_prefix + 'productResults is required');
     return {
-        renderGrid: (state, query) => {
-            if (state.products.length === 0) return query ? 'No data found' : '';
-            productResults.innerHTML = CardsGrid({ data: state.products, CardComponent: ProductCard });
+        renderGrid: (data, query) => {
+            if (data.length === 0) return query ? 'No data found' : '';
+            productResults.innerHTML = CardsGrid({ data, CardComponent: ProductCard });
         },
         updateCardFavoriteStatus: ({ card, btn, isFavorite }) => {
             if (!btn) throw new Error(error_prefix + ' Button (btn) is required.');
