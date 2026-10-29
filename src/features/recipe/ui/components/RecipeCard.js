@@ -25,6 +25,7 @@ export const RecipeCard = (recipe) => {
         data-action='toggle-recipe-favorite'
         data-active-text="${presentationState.btnText(true)}"
         data-inactive-text="${presentationState.btnText(false)}"
+        aria-pressed="${isFavorite ? 'true' : 'false'}"
         >
         ${presentationState.btnText(isFavorite)}
         </button>

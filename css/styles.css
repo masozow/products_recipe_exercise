@@ -41,11 +41,11 @@
 img {
     width: 100%;
     max-width: 5rem;
-    height: auto;
+    height: 5rem;
     object-fit: contain;
     margin-left: auto;
     margin-right: auto;
-    content-visibility: visible;
+    content-visibility: auto;
     contain-intrinsic-size: 5rem 5rem;
 }
 

@@ -19,9 +19,11 @@ export const recipewView = ({ results }) => {
             if (isFavorite) {
                 card.classList.add(activeClass);
                 btn.textContent = btnActiveText;
+                btn.setAttribute('aria-pressed', 'true');
             } else {
                 card.classList.remove(activeClass);
                 btn.textContent = btnInactiveText;
+                btn.setAttribute('aria-pressed', 'false');
             }
         }
     }
