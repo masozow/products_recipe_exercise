@@ -25,6 +25,7 @@ export const productService = ({ productRepo, favoriteRepo }) => {
             const normalizedQuery = query.trim();
             if (normalizedQuery === '') {
                 state.set(initialState);
+                ++reqId;
                 lastQuery = '';
                 return;
             }
