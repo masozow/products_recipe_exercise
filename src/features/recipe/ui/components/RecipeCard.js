@@ -3,6 +3,7 @@ import { esc } from "../../../../shared/utils/escapeHTML.js";
 export const RecipeCard = (recipe) => {
     const { image, id, isFavorite, name, ...rest } = recipe;
     const presentationState = {
+        dataComponent: "recipe-card",
         activeClass: "fav",
         btnText: (condition) => condition ? '[*] Remove favorite' : '[ ] Add to favorites'
     }
@@ -10,7 +11,7 @@ export const RecipeCard = (recipe) => {
     <article 
     data-id="${esc(id)}" 
     data-active-class="${presentationState.activeClass}"
-    data-component="recipe-card"
+    data-component="${presentationState.dataComponent}"
     class='card ${isFavorite ? presentationState.activeClass : ''}'>
         <h3>${esc(name)}</h3>
             ${Object.entries(rest).map(([key, value]) =>
