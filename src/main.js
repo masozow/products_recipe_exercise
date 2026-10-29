@@ -9,10 +9,10 @@ const validLoadingStatuses = Object.freeze({
     LOADED: 'loaded',
 })
 const { IDLE, DOWNLOADING, LOADED } = validLoadingStatuses;
-let loadingStatus = IDLE;
+
 const lazyLoadFeature = ({ searchElement, resultsElement, featureName, importModuleCallback }) => {
     if (!searchElement || !resultsElement) return;
-
+    let loadingStatus = IDLE;
     searchElement.addEventListener('input', async () => {
         // Guard clauses to prevent multiple parallel imports or redundant work
         if (loadingStatus === DOWNLOADING || loadingStatus === LOADED) return;

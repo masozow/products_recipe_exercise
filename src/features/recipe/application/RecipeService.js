@@ -27,6 +27,7 @@ export const recipeService = ({ recipeRepo, favoriteRepo }) => {
             if (normalizedQuery === '') {
                 state.set(initialState);
                 lastQuery = '';
+                ++reqId;
                 return;
             }
             if (lastQuery === normalizedQuery) return;
