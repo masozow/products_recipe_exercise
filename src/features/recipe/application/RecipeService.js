@@ -15,7 +15,7 @@ export const recipeService = ({ recipeRepo, favoriteRepo }) => {
     let reqId = 0;
     let lastQuery = '';
     const searchViewState = (data) => {
-        if (!Array.isArray(data)) throw new Error(error_prefix, ' Data Array is needed to make the searchViewState.');
+        if (!Array.isArray(data)) throw new Error(error_prefix + ' Data Array is needed to make the searchViewState.');
         const favoritesSet = new Set(favorites);
         return data.map((recipe) => ({ ...recipe, isFavorite: favoritesSet.has(Number(recipe.id)) }))
     }
@@ -49,7 +49,7 @@ export const recipeService = ({ recipeRepo, favoriteRepo }) => {
             }
         },
         toggleFavorite(recipeId) {
-            if (!recipeId) throw new Error(error_prefix, ' The recipe Id is required');
+            if (!recipeId) throw new Error(error_prefix + ' The recipe Id is required');
             const id = Number(recipeId);
             const isCurrentlyFavorite = favorites.includes(id);
             if (isCurrentlyFavorite) {

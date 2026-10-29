@@ -7,7 +7,7 @@ export const localFavoriteRepository = ({ key, errorLocationCall = '' }) => {
             return favs;
         },
         setFavorites: (favorites) => {
-            if (!favorites) throw new Error()
+            if (!favorites) throw new Error(error_prefix + ' favorites is required.')
             localStorage.setItem(key, JSON.stringify(favorites));
         }
     }
