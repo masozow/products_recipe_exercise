@@ -1,19 +1,22 @@
 import { ProductsSearchURL } from "../../../shared/dictionaries/ApiURLs.js";
 import { Product } from "../domain/Product.js";
-
+import { getItems } from "../../../shared/utils/getItems.js";
 export const apiProductRepository = (httpClient) => {
     const error_prefix = '[Infra error] ApiProductRepository. ';
     if (typeof httpClient !== 'function') throw new Error(error_prefix + 'httpClient must be a function.');
 
     return {
         getProducts: async (query) => {
-            if (!query.trim()) return [];
-            if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
             const url = ProductsSearchURL(query);
-            const rawProducts = await httpClient({ url });
-            if (!rawProducts.products) throw new Error(error_prefix + `Products object didn't returned: ${rawProducts}`)
-            if (!Array.isArray(rawProducts.products)) throw new Error(error_prefix + `Endpoint returned an invalid type: ${rawProducts}`);
-            return rawProducts.products.map((product) => Product(product));
+            return getItems({
+                query,
+                item_acces_key:
+                    'products',
+                ItemShape: Product,
+                url,
+                error_message_prefix: error_prefix,
+                httpClient
+            })
         },
     }
 }
