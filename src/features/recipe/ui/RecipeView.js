@@ -6,24 +6,7 @@ export const recipewView = ({ results }) => {
     if (!results)
         throw new Error(error_prefix + 'results is required.');
     return {
-        renderError: (errorState) => {
-            if (errorState)
-                results.innerHTML = `
-                <p class='.error'>
-                    Something went wrong, please try again later.
-                </p>
-                `;
-        },
-        renderLoading: (loadingState) => {
-            if (loadingState)
-                results.innerHTML = `
-                <p class='.loading'>
-                    Loading recipes...
-                </p>
-                `;
-        },
-        renderGrid: (data, query) => {
-            if (data.length === 0) return query ? 'No data found.' : '';
+        renderGrid: (data) => {
             results.innerHTML = CardsGrid({ data, CardComponent: RecipeCard })
         },
         updateCardFavoriteStatus: ({ btn, card, isFavorite }) => {
