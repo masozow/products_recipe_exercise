@@ -24,11 +24,18 @@
 
       main {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         place-items: center;
         gap: 1rem;
+        width: 100%;
+        padding: 1rem;
+        box-sizing: border-box;
       }
-
+      @media (min-width: 48rem) {
+        main {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
       main section {
         align-self: start;
         display: grid;
@@ -80,7 +87,7 @@
             placeholder="Search products..."
           />
         </div>
-        <div id="products-result"></div>
+        <div id="products-result" aria-live="polite"></div>
       </section>
       <section id="recipes">
         <div id="recipes-search-box" class="controls">
@@ -93,7 +100,7 @@
             placeholder="Search recipes..."
           />
         </div>
-        <div id="recipes-result"></div>
+        <div id="recipes-result" aria-live="polite"></div>
       </section>
     </main>
   </body>

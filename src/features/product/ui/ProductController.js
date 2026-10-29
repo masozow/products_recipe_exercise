@@ -1,9 +1,10 @@
 import { debounce } from "../../../shared/utils/debounce.js";
 import { productView } from "./ProductView.js";
-
-
+import { RenderStates } from "../../../shared/ui/components/RenderStates.js";
+import { validStates } from "../../../shared/dictionaries/validStates.js";
 export const productUI = ({ dom, productService }) => {
     const error_prefix = '[UI error] ProductController. ';
+    const featureName = 'products';
     try {
         const { productsSearch, productsResults } = dom;
         if (!productsSearch) throw new Error(error_prefix + ' Products search is required.');
@@ -11,32 +12,38 @@ export const productUI = ({ dom, productService }) => {
         if (!productService) throw new Error(error_prefix + 'Service is required');
         //Getting needed functions from factories
         const {
-            renderEmpty,
-            renderLoading,
             renderError,
+            renderIdle,
+            renderLoading,
+            renderEmpty
+        } = RenderStates(productsResults);
+        const {
             renderGrid,
             updateCardFavoriteStatus
         } = productView({ productResults: productsResults });
         const {
+            ERROR,
+            IDLE,
+            LOADING,
+            SUCCESS,
+            EMPTY
+        } = validStates;
+        const {
             search,
             toggleFavorite,
-            onProductChange,
-            onErrorChange,
-            onLoadingChange,
-            onEmptyChange,
+            onStateChange
         } = productService;
+
         //Subscriptions to signals for rendering control according to loading states:
-        onErrorChange((errorState) =>
-            renderError(errorState)
-        );
-        onLoadingChange((loadingState) =>
-            renderLoading(loadingState)
-        );
-        onEmptyChange((emptyState) =>
-            renderEmpty(emptyState)
-        );
-        onProductChange((data) => {
-            renderGrid(data, productsSearch.value.trim())
+        onStateChange((state) => {
+            switch (state.state) {
+                case ERROR: renderError(); break;
+                case LOADING: renderLoading(featureName); break;
+                case EMPTY: renderEmpty(); break;
+                case IDLE: renderIdle(featureName); break;
+                case SUCCESS: renderGrid(state.products, productsSearch.value.trim()); break;
+                default: renderIdle(featureName); break;
+            }
         });
         //#region Search logic
         const debouncedSearch = debounce(async (query) => await search(query), 500);

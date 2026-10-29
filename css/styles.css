@@ -41,10 +41,11 @@
 img {
     width: 100%;
     max-width: 5rem;
-    height: auto;
+    height: 5rem;
     object-fit: contain;
     margin-left: auto;
     margin-right: auto;
+    content-visibility: auto;
     contain-intrinsic-size: 5rem 5rem;
 }
 
@@ -75,7 +76,7 @@ img {
     color: rgb(40, 40, 40);
 }
 
-.fav btn {
+.fav button {
     background-color: rgb(0, 72, 65);
     color: #ccc;
 }

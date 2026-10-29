@@ -1,43 +1,71 @@
 
 const error_prefix = '[Main error] ';
-//#region Product
-//DOM elements
-const productsSearch = document.getElementById('products-search');
-const productsResults = document.getElementById('products-result');
-//Logic
-if (productsSearch && productsResults) {
-    productsSearch.addEventListener('input', async (e) => {
-        productsResults.innerHTML = `<p class="loading">Loading products...</p>`;
+const createLoader = (featureName = '') => `
+    <p class="loading">Loading${featureName ? ' ' + featureName : ''}...</p>
+`;
+const validLoadingStatuses = Object.freeze({
+    IDLE: 'idle',
+    DOWNLOADING: 'downloading',
+    LOADED: 'loaded',
+})
+const { IDLE, DOWNLOADING, LOADED } = validLoadingStatuses;
+let loadingStatus = IDLE;
+const lazyLoadFeature = ({ searchElement, resultsElement, featureName, importModuleCallback }) => {
+    if (!searchElement || !resultsElement) return;
+
+    searchElement.addEventListener('input', async () => {
+        // Guard clauses to prevent multiple parallel imports or redundant work
+        if (loadingStatus === DOWNLOADING || loadingStatus === LOADED) return;
+
+        loadingStatus = DOWNLOADING;
+        resultsElement.innerHTML = createLoader(featureName);
+
         try {
-            const { ProductModule } = await import('./features/product/ProductModule.js');
-            ProductModule({ productsSearch, productsResults });
+            // Execute the specific dynamic import callback, to
+            // extract the Module Namespace Object (ProductModule or RecipeModule)
+            const module = await importModuleCallback();
+            // Extract the array of the exported names (keys) by the module
+            const moduleKeys = Object.keys(module);
+            // Extracting the name of the first exported member, which
+            // in this case corresponds to the module name
+            const moduleNameAsString = moduleKeys[0];
+            // Extracting the function that will be executed, that represents the
+            // module, passing a named property with its name
+            const moduleExecutableFunction = module[moduleNameAsString];
+            // Assembling the elements names to be passed as a named properties
+            const featureSearchElement = `${featureName}Search`;
+            const featureResultsElement = `${featureName}Results`;
+            // Execute the module, passing it the elements it needs:
+            moduleExecutableFunction({
+                [featureSearchElement]: searchElement,
+                [featureResultsElement]: resultsElement
+            });
+
+            loadingStatus = LOADED; // Mark as successfully mounted
         } catch (error) {
-            console.error(error_prefix, error);
-            productsResults.innerHTML = '';
+            console.error(error_prefix + `Failed to lazy-load ${featureName}:`, error);
+            resultsElement.innerHTML = `<p class="error">Connection failed. Type again to retry.</p>`;
+            loadingStatus = IDLE;
         }
+    });
+};
 
-    }, { once: true });
-}
+//#region Initialization
+// Products
+lazyLoadFeature({
+    searchElement: document.getElementById('products-search'),
+    resultsElement: document.getElementById('products-result'),
+    featureName: 'products',
+    importModuleCallback: () => import('./features/product/ProductModule.js')
+});
+
+//  Recipes
+lazyLoadFeature({
+    searchElement: document.getElementById('recipes-search'),
+    resultsElement: document.getElementById('recipes-result'),
+    featureName: 'recipes',
+    importModuleCallback: () => import('./features/recipe/RecipeModule.js')
+});
 //#endregion
-
-//#region Recipe
-//DOM elements
-const recipesSearch = document.getElementById('recipes-search');
-const recipesResults = document.getElementById('recipes-result');
-//Logic
-if (recipesSearch && recipesResults) {
-    recipesSearch.addEventListener('input', async (e) => {
-        recipesResults.innerHTML = `<p class="loading">Loading recipes...</p>`;
-        try {
-            const { RecipeModule } = await import('./features/recipe/RecipeModule.js');
-            RecipeModule({ recipesSearch, recipesResults });
-        } catch (error) {
-            console.error(error_prefix, error);
-            recipesResults.innerHTML = '';
-        }
-    }, { once: true })
-}
-//#endregion
-
 
 // import('./shared/test/index.js');

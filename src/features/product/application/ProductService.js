@@ -1,62 +1,50 @@
 import { createSignal } from "../../../shared/utils/createSignal.js";
+import { validStates } from "../../../shared/dictionaries/validStates.js";
 
 export const productService = ({ productRepo, favoriteRepo }) => {
     const error_prefix = '[Application error] ProductService. ';
     if (!productRepo || !favoriteRepo) throw new Error(error_prefix + ' Repositories are required.');
+    const { IDLE, ERROR, SUCCESS, LOADING, EMPTY } = validStates;
     const initialState = {
         products: [],
-        isLoading: false,
-        isError: false,
-        isEmpty: false
+        state: IDLE
     }
-    const products = createSignal(initialState.products);
-    const isLoading = createSignal(initialState.isLoading);
-    const isError = createSignal(initialState.isError);
-    const isEmpty = createSignal(initialState.isEmpty);
+    const state = createSignal(initialState);
     let reqId = 0;
     let lastQuery = '';
     let favorites = favoriteRepo.getFavorites();
-    const searchState = (data) => {
+    const displayState = (data) => {
         if (!Array.isArray(data)) throw new Error(error_prefix + ' data is required as an Array.');
         const favoritesSet = new Set(favorites);
         return data.map((product) => ({ ...product, isFavorite: favoritesSet.has(product.id) }))
     }
-    const resetSignals = () => {
-        products.set(initialState.products);
-        isLoading.set(initialState.isLoading);
-        isError.set(initialState.isError);
-        isEmpty.set(initialState.isEmpty);
-    }
     return {
-        onErrorChange: isError.subscribe,
-        onLoadingChange: isLoading.subscribe,
-        onProductChange: products.subscribe,
-        onEmptyChange: isEmpty.subscribe,
+        onStateChange: state.subscribe,
         search: async (query) => {
             if (typeof query !== 'string') throw new Error(error_prefix + 'Query must be a string.');
             const normalizedQuery = query.trim();
             if (normalizedQuery === '') {
-                resetSignals();
+                state.set(initialState);
+                lastQuery = '';
+                return;
             }
             if (lastQuery === normalizedQuery) return;
             lastQuery = normalizedQuery;
+            state.set({ products: [], state: LOADING });
             const currentReqId = ++reqId;
             try {
-                isError.set(false);
-                isLoading.set(true);
-                isEmpty.set(false);
                 const data = await productRepo.getProducts(query);
                 if (currentReqId !== reqId) return;
-                if (data.length === 0 && normalizedQuery)
-                    isEmpty.set(true);
-                const state = searchState(data);
-                isLoading.set(false);
-                products.set(state);
+                if (data.length === 0 && normalizedQuery) {
+                    state.set({ products: [], state: EMPTY })
+                    return;
+                }
+                const products = displayState(data);
+                state.set({ products, state: SUCCESS });
             } catch (error) {
                 if (reqId !== currentReqId) return;
                 console.error(error_prefix, error);
-                isError.set(true);
-                isLoading.set(false);
+                state.set({ products: [], state: ERROR });
             }
         },
         toggleFavorite: (productId) => {

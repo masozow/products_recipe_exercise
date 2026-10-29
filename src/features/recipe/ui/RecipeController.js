@@ -1,7 +1,11 @@
 import { debounce } from "../../../shared/utils/debounce.js";
 import { recipewView } from "./RecipeView.js";
+import { RenderStates } from "../../../shared/ui/components/RenderStates.js";
+import { validStates } from "../../../shared/dictionaries/validStates.js";
 export const recipeUI = ({ dom, recipeService }) => {
     const error_prefix = '[UI Error] RecipeController. ';
+    const { ERROR, IDLE, SUCCESS, EMPTY, LOADING } = validStates;
+    const moduleName = 'recipes';
     try {
         const { recipesSearch, recipesResults } = dom;
         if (!recipesSearch) throw new Error(error_prefix + 'recipesSearch is required.');
@@ -10,27 +14,33 @@ export const recipeUI = ({ dom, recipeService }) => {
         //Prepping needed functions
         const {
             updateCardFavoriteStatus,
-            renderError,
-            renderLoading,
             renderGrid
         } = recipewView({ results: recipesResults });
         const {
             search,
             toggleFavorite,
-            onErrorChange,
-            onRecipesChange,
-            onLoadingChange,
+            onStateChange,
         } = recipeService;
+        const renderStates = RenderStates(recipesResults);
         //#region ErrorStatesLogic
-        onErrorChange((errorState) => {
-            renderError(errorState);
+        onStateChange((state) => {
+            switch (state.state) {
+                case IDLE:
+                    renderStates.renderIdle(moduleName); break;
+                case ERROR:
+                    renderStates.renderError(); break;
+                case LOADING:
+                    renderStates.renderLoading(moduleName); break;
+                case EMPTY:
+                    renderStates.renderEmpty(); break;
+                case SUCCESS:
+                    renderGrid(state.recipes, recipesSearch.value); break;
+                default:
+                    renderStates.renderIdle(moduleName); break;
+            }
         });
-        onLoadingChange((loadingState) => {
-            renderLoading(loadingState);
-        })
         //#endregion
-        //#region SearchLogic
-        onRecipesChange((state) => renderGrid(state, recipesSearch.value));
+        //#region SearchLogin
         const debouncedSearch = debounce(async (query) => await search(query), 500);
         recipesSearch.addEventListener('input', (e) =>
             debouncedSearch(e.target.value)
@@ -53,7 +63,6 @@ export const recipeUI = ({ dom, recipeService }) => {
             const recipeId = card.dataset.id;
             const isFavorite = action(recipeId);
             updateCardFavoriteStatus({ btn, card, isFavorite });
-
         });
         //updateCardFavoriteStatus({ toggleFavorite });
         //#endregion

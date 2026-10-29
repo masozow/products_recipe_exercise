@@ -42,9 +42,11 @@ export const productView = ({ productResults }) => {
             if (isFavorite) {
                 card.classList.add(cardActiveClass);
                 btn.textContent = btnActiveText;
+                btn.setAttribute('aria-pressed', 'true');
             } else {
                 card.classList.remove(cardActiveClass);
                 btn.textContent = btnInactiveText
+                btn.setAttribute('aria-pressed', 'false');
             }
         }
     }

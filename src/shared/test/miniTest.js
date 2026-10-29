@@ -28,6 +28,6 @@ export const silenced = async (fn) => {
     try {
         await fn();
     } finally {
-        console.errorr = original_console_error;
+        console.error = original_console_error;
     }
 }

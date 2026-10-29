@@ -28,8 +28,8 @@ const fakeFetchFactory = ({ ok = true, status = 200, statusText = '', data = [] 
     }
     return async () => returnData;
 }
-describe('HttpClient tests', async () => {
-    it('Happy path', async () => {
+await describe('HttpClient tests', async () => {
+    await it('Happy path', async () => {
         //1. Arrange
         const fetcher = fakeFetchFactory({ data: mockData });
         //2. Act
